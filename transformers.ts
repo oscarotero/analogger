@@ -5,3 +5,5 @@ export { default as filterByExtension } from "./transformers/filter_by_extension
 export { default as filterByTimeRange } from "./transformers/filter_by_time_range.ts";
 export { default as isBot } from "./transformers/is_bot.ts";
 export { default as sessionId } from "./transformers/session_id.ts";
+export { default as searchEngine } from "./transformers/search_engine.ts";
+export { default as socialNetwork } from "./transformers/social_network.ts";

@@ -10,7 +10,7 @@ export interface Log {
   protocol?: string;
   status?: number;
   size?: number;
-  referrer?: string;
+  referrer?: URL;
   userAgent?: string;
   isBot?: boolean;
   browserName?: string;
@@ -22,11 +22,10 @@ export interface Log {
   engineVersion?: string;
   osName?: string;
   osVersion?: string;
+  searchEngine?: string;
+  socialNetwork?: string;
   [index: string]: unknown;
 }
-
-/* A stream of logs */
-export type LogStream = AsyncIterableIterator<Log>;
 
 /** A group of logs */
 export type LogGroup = Map<string | number, Log[] | LogGroup>;

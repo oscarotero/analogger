@@ -41,9 +41,13 @@ export function group(logs: Log[], ...keys: Key[]): LogGroup {
   }
 
   for (const log of logs) {
-    const name = typeof key === "function"
+    let name = typeof key === "function"
       ? key(log)
-      : (log[key] as string | number);
+      : (log[key] as string | number | URL);
+
+    if (name instanceof URL) {
+      name = name.href;
+    }
 
     if (!map.has(name)) {
       map.set(name, []);
@@ -149,4 +153,20 @@ async function generateHtml(data: ReportData, library: string) {
   </body>
   </html>
   `;
+}
+
+export function sortReport(
+  labels: string[],
+  values: number[],
+): [string[], number[]] {
+  const sorted = labels.map((label, index) => ({
+    label,
+    value: values[index],
+  }));
+  sorted.sort((a, b) => b.value - a.value);
+
+  return [
+    sorted.map((item) => item.label),
+    sorted.map((item) => item.value),
+  ];
 }

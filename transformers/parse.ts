@@ -31,7 +31,7 @@ interface ParsedLog {
   protocol: string;
   status: number;
   size: number;
-  referrer?: string;
+  referrer?: URL;
   userAgent?: string;
 }
 
@@ -57,7 +57,7 @@ function parseLog(log: string): ParsedLog {
   const protocol = match[12];
   const status = parseInt(match[13]);
   const size = parseInt(match[14]);
-  const referrer = str(match[15]);
+  const referrer = url(match[15]);
   const userAgent = str(match[16]);
 
   return {
@@ -81,4 +81,18 @@ function str(value: string): string | undefined {
   }
 
   return value;
+}
+
+function url(value: string): URL | undefined {
+  const val = str(value);
+
+  if (!val) {
+    return;
+  }
+
+  try {
+    return new URL(val);
+  } catch {
+    return;
+  }
 }

@@ -5,12 +5,14 @@ export default function (
   logs: Log[],
   interval: TimeInterval = "daily",
 ): ReportData {
+  // Group visits by interval and session
   const grouped = group(
     logs,
     (log) => dateToString(log.date!, interval),
     "sessionId",
   );
 
+  // Generate the report
   const labels = [];
   const data = [];
 
