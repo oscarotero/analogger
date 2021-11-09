@@ -1,3 +1,5 @@
+<!-- deno-fmt-ignore-file -->
+
 # Analogger
 
 This is a simple [Deno](https://deno.land/) library to consume access logs
@@ -11,9 +13,13 @@ It's divided in two scopes:
 ## Example
 
 ```ts
-import { read, show, transform } from "https://deno.land/x/analogger/mod.ts";
-import * as reports from "https://deno.land/x/analogger/reports.ts";
-import * as t from "https://deno.land/x/analogger/transformers.ts";
+import {
+  read,
+  show,
+  reports,
+  transform,
+  transformers as t
+} from "https://deno.land/x/analogger/mod.ts";
 
 const logs = read("./access.log"), // Read the log file.
 

@@ -6,6 +6,9 @@ import {
   Transformer,
 } from "./types.ts";
 
+export * as transformers from "./transformers.ts";
+export * as reports from "./reports.ts";
+
 /** Transform a stream of logs and return an array */
 export async function transform(
   logs: Promise<Log | undefined>[],
