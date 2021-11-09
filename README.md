@@ -11,14 +11,8 @@ It's divided in two scopes:
 ## Example
 
 ```ts
-import {
-  read,
-  saveHTML,
-  saveJSON,
-  show,
-  transform,
-} from "https://deno.land/x/analogger/mod.ts";
-import { sessions } from "https://deno.land/x/analogger/reports.ts";
+import { read, show, transform } from "https://deno.land/x/analogger/mod.ts";
+import * as reports from "https://deno.land/x/analogger/reports.ts";
 import * as t from "https://deno.land/x/analogger/transformers.ts";
 
 const logs = read("./access.log"), // Read the log file.
@@ -26,7 +20,7 @@ const logs = read("./access.log"), // Read the log file.
 // Step 1: Parse and transform the logs:
 const result = await transform(
   logs,
-  t.parse(), // Parse the data.
+  t.parse(),                             // Parse the data.
   t.filterByExtensions([".html", ""]),   // Filter by .html extensions or not extension at all.
   t.filterByTimeRange(                   // Filter by time range (one year, from 2020 to 2021).
     new Date(2020),
@@ -44,15 +38,8 @@ const result = await transform(
 
 // Step 2: Generate reports with this data.
 // For example, the number of sessions by month:
-const report = session(result, "monthly");
+const report = reports.sessions(result, "monthly");
 
-// Step 3:
-// Save the result in an interactive html file that you can open in your browser
-await saveHTML("sessions.html", report);
-
-// Or save only the JSON data of this report
-await saveJSON("sessions.json", report);
-
-// Or create a local server to see in your browser
+// Step 3: See the report in your browser
 await show(report);
 ```
