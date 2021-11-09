@@ -1,21 +1,18 @@
-import { LogStream, Transformer } from "../types.ts";
+import { Log, Transformer } from "../types.ts";
 import { UAParser } from "../deps.ts";
 
 /** Transformer to parse the user-agent string and store the values in different properties */
 export default function (): Transformer {
-  return async function* parse(logs: LogStream): LogStream {
-    for await (const log of logs) {
-      try {
-        if (log.userAgent) {
-          const parsed = parseUA(log.userAgent);
-          yield { ...log, ...parsed };
-          continue;
-        }
-
-        yield log;
-      } catch {
-        // ignore
+  return function parse(log: Log): Log | undefined {
+    try {
+      if (log.userAgent) {
+        const parsed = parseUA(log.userAgent);
+        return { ...log, ...parsed };
       }
+
+      return log;
+    } catch {
+      // ignore
     }
   };
 }

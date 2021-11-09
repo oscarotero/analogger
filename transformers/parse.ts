@@ -1,4 +1,4 @@
-import { LogStream, Transformer } from "../types.ts";
+import { Log, Transformer } from "../types.ts";
 
 /** Only "combined" format is supported */
 export type Format = "combined";
@@ -9,17 +9,15 @@ export default function (format: Format = "combined"): Transformer {
     throw new Error(`Unsupported format: ${format}`);
   }
 
-  return async function* parse(logs: LogStream): LogStream {
-    for await (const log of logs) {
-      try {
-        const parsed = parseLog(log.raw);
-        yield {
-          ...log,
-          ...parsed,
-        };
-      } catch {
-        // ignore
-      }
+  return function parse(log: Log): Log | undefined {
+    try {
+      const parsed = parseLog(log.raw);
+      return {
+        ...log,
+        ...parsed,
+      };
+    } catch {
+      // ignore
     }
   };
 }

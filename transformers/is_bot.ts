@@ -1,12 +1,10 @@
-import { LogStream, Transformer } from "../types.ts";
+import { Log, Transformer } from "../types.ts";
 
 /** Transformer to add the `isBot` property to the logs */
 export default function (): Transformer {
-  return async function* (logs: LogStream): LogStream {
-    for await (const log of logs) {
-      log.isBot = isBot(log.userAgent);
-      yield log;
-    }
+  return function (log: Log): Log {
+    log.isBot = isBot(log.userAgent);
+    return log;
   };
 }
 

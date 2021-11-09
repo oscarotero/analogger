@@ -31,8 +31,8 @@ export type LogStream = AsyncIterableIterator<Log>;
 /** A group of logs */
 export type LogGroup = Map<string | number, Log[] | LogGroup>;
 
-/** The function to transform the stream of logs */
-export type Transformer = (log: LogStream) => LogStream;
+/** The function to transform a logs */
+export type Transformer = (log: Log) => Log | undefined;
 
 /** Available time intervals used by reports */
 export type TimeInterval = "hourly" | "daily" | "weekly" | "monthly" | "yearly";

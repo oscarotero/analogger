@@ -1,55 +1,32 @@
 import {
   Log,
   LogGroup,
-  LogStream,
   ReportData,
   TimeInterval,
   Transformer,
 } from "./types.ts";
-import { iterateReader } from "./deps.ts";
 
 /** Transform a stream of logs and return an array */
 export async function transform(
-  stream: LogStream,
+  logs: Promise<Log | undefined>[],
   ...transformers: Transformer[]
 ): Promise<Log[]> {
   while (transformers.length) {
-    const transformer = transformers.shift();
-    if (transformer) {
-      stream = transformer(stream);
-    }
+    const transformer = transformers.shift()!;
+    logs = logs.map((log) => log.then((log) => log ? transformer(log) : log));
   }
 
-  const result = [];
-
-  for await (const log of stream) {
-    result.push(log);
-  }
-
-  return result;
+  const result = await Promise.all(logs);
+  return result.filter((log) => log) as Log[];
 }
 
 /** Read logs from a file */
-export async function* read(path: string): LogStream {
-  const file = await Deno.open(path);
-  const iterator = iterateReader(file);
-  const decoder = new TextDecoder();
-  let buffer = "";
-
-  for await (const chunk of iterator) {
-    buffer += decoder.decode(chunk);
-
-    if (buffer.includes("\n")) {
-      const logs = buffer.split("\n");
-      buffer = logs.pop()!;
-
-      for (const raw of logs) {
-        yield { raw };
-      }
-    }
-  }
-
-  file.close();
+export async function read(path: string): Promise<Promise<Log>[]> {
+  const content = await Deno.readTextFile(path);
+  return content.split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length)
+    .map((line) => Promise.resolve({ raw: line }));
 }
 
 export type Key = string | number | ((log: Log) => string | number);
