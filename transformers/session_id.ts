@@ -3,7 +3,7 @@ import { createHash } from "../deps.ts";
 
 /** Transformer to generate a session id automatically */
 export default function (): Transformer {
-  return function (log: Log): Log | undefined {
+  return function (log: Log): Log {
     const sha1 = createHash("sha1");
     sha1.update(
       `${log.ip}-${log.user}-${log.date?.toDateString()}-${log.userAgent}`,

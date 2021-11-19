@@ -7,3 +7,6 @@ export { default as isBot } from "./transformers/is_bot.ts";
 export { default as sessionId } from "./transformers/session_id.ts";
 export { default as searchEngine } from "./transformers/search_engine.ts";
 export { default as socialNetwork } from "./transformers/social_network.ts";
+export { default as searchParams } from "./transformers/search_params.ts";
+export { default as campaign } from "./transformers/campaign.ts";
+export { default as limit } from "./transformers/limit.ts";

@@ -3,17 +3,17 @@ import { UAParser } from "../deps.ts";
 
 /** Transformer to parse the user-agent string and store the values in different properties */
 export default function (): Transformer {
-  return function parse(log: Log): Log | undefined {
+  return function parse(log: Log): Log {
     try {
       if (log.userAgent) {
         const parsed = parseUA(log.userAgent);
         return { ...log, ...parsed };
       }
-
-      return log;
     } catch {
       // ignore
     }
+
+    return log;
   };
 }
 

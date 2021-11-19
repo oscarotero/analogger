@@ -18,6 +18,7 @@ export const socialNetworks: SocialNetworkList = new Map([
   ["twitter", [new URLPattern({ hostname: "t.co" })]],
   ["youtube", [new URLPattern({ hostname: "www.youtube.com" })]],
   ["pinterest", [new URLPattern({ hostname: "*.pinterest.*" })]],
+  ["pocket", [new URLPattern({ hostname: "*.getpocket.com" })]],
   [
     "pinterest android",
     [new URLPattern({ hostname: "com.pinterest", protocol: "android-app" })],

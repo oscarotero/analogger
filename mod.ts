@@ -6,30 +6,61 @@ import {
   Transformer,
 } from "./types.ts";
 
+import { iterateReader } from "./deps.ts";
 export * as transformers from "./transformers.ts";
 export * as reports from "./reports.ts";
 
 /** Transform a stream of logs and return an array */
 export async function transform(
-  logs: Promise<Log | undefined>[],
+  input: AsyncIterableIterator<Log>,
   ...transformers: Transformer[]
 ): Promise<Log[]> {
-  while (transformers.length) {
-    const transformer = transformers.shift()!;
-    logs = logs.map((log) => log.then((log) => log ? transformer(log) : log));
+  const logs: Log[] = [];
+
+  for await (const log of input) {
+    const result = transformers.reduce(
+      (log: Log | undefined, transformer) => log ? transformer(log) : undefined,
+      log,
+    );
+
+    if (result) {
+      logs.push(result);
+    }
   }
 
-  const result = await Promise.all(logs);
-  return result.filter((log) => log) as Log[];
+  return logs;
 }
 
 /** Read logs from a file */
-export async function read(path: string): Promise<Promise<Log>[]> {
-  const content = await Deno.readTextFile(path);
-  return content.split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.length)
-    .map((line) => Promise.resolve({ raw: line }));
+export async function* read(
+  path: string,
+  limit = 10000,
+): AsyncIterableIterator<Log> {
+  const file = await Deno.open(path);
+  const iterator = iterateReader(file);
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let count = 0;
+
+  read:
+  for await (const chunk of iterator) {
+    buffer += decoder.decode(chunk);
+
+    if (buffer.includes("\n")) {
+      const lines = buffer.split("\n");
+      buffer = lines.pop()!;
+
+      for (const raw of lines) {
+        yield { raw };
+
+        if (++count >= limit) {
+          break read;
+        }
+      }
+    }
+  }
+
+  file.close();
 }
 
 export type Key = string | number | ((log: Log) => string | number);

@@ -24,6 +24,8 @@ export interface Log {
   osVersion?: string;
   searchEngine?: string;
   socialNetwork?: string;
+  searchParams?: URLSearchParams;
+  campaign?: string;
   [index: string]: unknown;
 }
 
