@@ -1,14 +1,18 @@
 import { Log, Transformer } from "../types.ts";
-import { createHash } from "../deps.ts";
 
 /** Transformer to generate a session id automatically */
 export default function (): Transformer {
-  return function (log: Log): Log {
-    const sha1 = createHash("sha1");
-    sha1.update(
+  return async function (log: Log): Promise<Log> {
+    log.sessionId = await sha1(
       `${log.ip}-${log.user}-${log.date?.toDateString()}-${log.userAgent}`,
     );
-    log.sessionId = sha1.toString();
     return log;
   };
+}
+
+const decoder = new TextDecoder();
+const encoder = new TextEncoder();
+export async function sha1(message: string): Promise<string> {
+  const hash = await crypto.subtle.digest("SHA-1", encoder.encode(message));
+  return decoder.decode(hash);
 }

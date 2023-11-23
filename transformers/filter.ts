@@ -1,9 +1,9 @@
 import { Log, Transformer } from "../types.ts";
 
 /** Transformer to filter the logs using a custom filter function */
-export default function (filter: (log: Log) => boolean): Transformer {
-  return function (log: Log): Log | undefined {
-    if (filter(log)) {
+export default function (fn: (log: Log) => boolean): Transformer {
+  return function filter(log: Log): Log | undefined {
+    if (fn(log)) {
       return log;
     }
   };

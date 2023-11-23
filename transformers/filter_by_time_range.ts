@@ -2,7 +2,7 @@ import { Log, Transformer } from "../types.ts";
 
 /** Transformer to filter logs by a specific time range */
 export default function (from?: Date, to?: Date): Transformer {
-  return function (log: Log): Log | undefined {
+  return function filterByTimeRange(log: Log): Log | undefined {
     if (!log.date) {
       return;
     }

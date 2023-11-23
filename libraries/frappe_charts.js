@@ -8,7 +8,7 @@ document.head.appendChild(script);
 script.addEventListener("load", () => {
   const { title, labels, datasets } = data;
 
-  const chart = new frappe.Chart(
+  new frappe.Chart(
     document.getElementById("chart"),
     {
       title,
@@ -23,7 +23,4 @@ script.addEventListener("load", () => {
       },
     },
   );
-
-  // Display
-  chart.export();
 });

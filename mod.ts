@@ -6,7 +6,7 @@ import {
   Transformer,
 } from "./types.ts";
 
-import { iterateReader } from "./deps.ts";
+import { TextLineStream } from "./deps.ts";
 export * as transformers from "./transformers.ts";
 export * as reports from "./reports.ts";
 
@@ -17,15 +17,17 @@ export async function transform(
 ): Promise<Log[]> {
   const logs: Log[] = [];
 
-  for await (const log of input) {
-    const result = transformers.reduce(
-      (log: Log | undefined, transformer) => log ? transformer(log) : undefined,
-      log,
-    );
+  logs: for await (let log of input) {
+    for (const transformer of transformers) {
+      const result = await transformer(log);
 
-    if (result) {
-      logs.push(result);
+      if (!result) {
+        continue logs;
+      }
+      log = result;
     }
+
+    logs.push(log);
   }
 
   return logs;
@@ -33,34 +35,24 @@ export async function transform(
 
 /** Read logs from a file */
 export async function* read(
-  path: string,
+  url: string,
   limit = 10000,
 ): AsyncIterableIterator<Log> {
-  const file = await Deno.open(path);
-  const iterator = iterateReader(file);
-  const decoder = new TextDecoder();
-  let buffer = "";
+  // Read a file line by line
+  const res = await fetch(url);
+  const lines = res.body!
+    .pipeThrough(new TextDecoderStream())
+    .pipeThrough(new TextLineStream());
+
+  // Parse each line
   let count = 0;
+  for await (const raw of lines) {
+    yield { raw };
 
-  read:
-  for await (const chunk of iterator) {
-    buffer += decoder.decode(chunk);
-
-    if (buffer.includes("\n")) {
-      const lines = buffer.split("\n");
-      buffer = lines.pop()!;
-
-      for (const raw of lines) {
-        yield { raw };
-
-        if (++count >= limit) {
-          break read;
-        }
-      }
+    if (++count >= limit) {
+      break;
     }
   }
-
-  file.close();
 }
 
 export type Key = string | number | ((log: Log) => string | number);
